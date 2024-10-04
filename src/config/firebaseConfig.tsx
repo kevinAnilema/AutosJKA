@@ -3,8 +3,8 @@ import { initializeApp } from 'firebase/app';
 // Optionally import the services that you want to use
 import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import {getDatabase} from "firebase/database";
 
-// import {...} from "firebase/database";
 // import {...} from "firebase/firestore";
 // import {...} from "firebase/functions";
 // import {...} from "firebase/storage";
@@ -16,7 +16,8 @@ const firebaseConfig = {
     projectId: "productnatura-50dbb",
     storageBucket: "productnatura-50dbb.appspot.com",
     messagingSenderId: "439596059350",
-    appId: "1:439596059350:web:5f312b57a32584d0b89777"
+    appId: "1:439596059350:web:5f312b57a32584d0b89777",
+    databaseURL:"https://productnatura-50dbb-default-rtdb.firebaseio.com/"
   };
 
 const firebase = initializeApp(firebaseConfig);
@@ -27,3 +28,6 @@ const firebase = initializeApp(firebaseConfig);
 export const auth = initializeAuth(firebase, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
+
+// Initialize Realtime Database and get a reference to the service
+export const dbRealTime = getDatabase(firebase);

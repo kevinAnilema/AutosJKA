@@ -6,11 +6,12 @@ import React from 'react'
 import { PaperProvider } from 'react-native-paper';
 import { NavigationContainer} from '@react-navigation/native';
 import { StakNavigator } from './src/navigator/Stacknavigator';
+
 export const App = () => {
   return (
     <NavigationContainer>
-      <PaperProvider>      
-        <StakNavigator></StakNavigator>
+      <PaperProvider>
+          <StakNavigator></StakNavigator>
       </PaperProvider>
     </NavigationContainer>
       
