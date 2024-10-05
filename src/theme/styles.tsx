@@ -65,6 +65,12 @@ export const styles=StyleSheet.create({
     rootImputsProduct:{
         flexDirection:'row',
         gap:12
+    },
+    rootDetail:{
+        flex:1,
+        padding:20,
+        backgroundColor:'#fff',
+        gap:20        
     }
 
 })

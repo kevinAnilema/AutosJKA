@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Button, Divider, IconButton, Modal, Portal, Snackbar, Text, TextInput } from 'react-native-paper'
 import { styles } from '../../theme/styles';
 import { View } from 'react-native';
-import { dbRealTime } from '../../config/firebaseConfig';
+import { auth, dbRealTime } from '../../config/firebaseConfig';
 import { push, ref, set } from 'firebase/database';
 
 //Interfaz - props
@@ -64,7 +64,7 @@ export const NewProductComponent = ({ShowModalProduct,setShowModalProduct}:Props
     
     //console.log(formProduct);
     //1. Crear el phat o direccionar a la base de datos
-    const dbRef=ref(dbRealTime,'autos');
+    const dbRef=ref(dbRealTime,'autos'+auth.currentUser?.uid);
     //2. crear una coleccion que agrege los datos a en la REF
     const saveAutos=push(dbRef)
     //3. Almacenar los datos en la base de datos

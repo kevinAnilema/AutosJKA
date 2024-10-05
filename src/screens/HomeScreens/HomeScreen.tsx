@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react'
 import { FlatList, View } from 'react-native'
 import { Avatar, Button, Divider, FAB, IconButton, Modal, Portal, Text, TextInput } from 'react-native-paper'
 import { styles } from '../../theme/styles'
-import { onAuthStateChanged, updateProfile } from 'firebase/auth'
-import { auth } from '../../config/firebaseConfig'
+import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
+import { auth, dbRealTime } from '../../config/firebaseConfig'
 import  FirebaseApp  from 'firebase/auth'
 import { ProductCardComponent } from './components/ProductCardComponent'
 import { NewProductComponent } from './NewProductComponent'
+import { onValue, ref } from 'firebase/database'
+import { CommonActions, useNavigation } from '@react-navigation/native'
 //Interfaz formUser
 interface FormUser{
   name:string
 }
 //interfaz para producto
-interface Auto{
+export interface Auto{
   id:string;
   codigo:string;
   modeloAuto:string;
@@ -45,6 +47,8 @@ export const HomeScreen = () => {
   useEffect(()=>{
     setuserData(auth.currentUser);
     setFormUser({name:auth.currentUser?.displayName??'NA'})
+    //Llmar la funcion para la lista de productos
+    getAllProducts();
   },[]);
   
   //Funcion: actualizar el estado del formulario
@@ -65,7 +69,47 @@ export const HomeScreen = () => {
     //Ocultar el modal
     setshowModalProfile(false);
   }
+  //Funcion para obeter los producto y listarlos
+  const getAllProducts=()=>{
+    //1. Direccionar a la base de datos
+    const dbRef=ref(dbRealTime,'autos'+auth.currentUser?.uid);
+    //2.0 Acceder a la data  
+    onValue(dbRef,(snapshot)=>{
+      //3 Capturar la data
+      const data=snapshot.val();//Obtener la data en un formato esperado
+      //Verficar que exista data
+      if(!data){
+        return
+      }
+      //4. Obtener las key de cada valor
+      const getKeys=Object.keys(data);
+      //5. Crear un arrelgo para almacenar cada producto que se obtiene
+      const listAutos:Auto[]=[]
+      //Recorrer las keys para acceder a cada producto
+      getKeys.forEach((key)=>{
+        const value={...data[key],id:key}
+        listAutos.push(value);        
+      });
+      //7 Actaulizar la data ontenida en el arreglo del hook ustestate
+      setautos(listAutos);
+    })
+  }
+  //Navegacion
+  const navigation=useNavigation();
+  //Funcion apra cerrar sesion
+  const handleSingOut=async()=>{
+    try {
+      
+      await signOut(auth);
+      navigation.dispatch(CommonActions.reset({
+        index:0,
+        routes:[{name:'Login'}]
+      }))
 
+    } catch (error) {
+      console.log(error);      
+    }    
+  }
   return (
     <>
     <View style={styles.rootHome}>
@@ -77,7 +121,7 @@ export const HomeScreen = () => {
           </View>
           <View style={styles.icon}>
             <IconButton
-                icon="account-edit"
+                icon="account-cog"
                 size={20}
                 mode='contained'
                 onPress={() => setshowModalProfile(true)}
@@ -87,7 +131,7 @@ export const HomeScreen = () => {
       <View>
       <FlatList
         data={autos}
-        renderItem={({item}) => <ProductCardComponent/>}
+        renderItem={({item}) => <ProductCardComponent auto={item}/>}
         keyExtractor={item => item.id}
       />
       </View>
@@ -117,7 +161,8 @@ export const HomeScreen = () => {
           disabled
           value={userData?.email!}
         />
-        <Button mode='contained' onPress={handleUpdaterUser}>Actualizar</Button>
+        <Button mode='contained' onPress={handleUpdaterUser}>Actualizar</Button>        
+      <Button icon={'logout'} mode='contained' onPress={handleSingOut}>Cerrar sesion</Button>
       </Modal>
     </Portal>
     <FAB

@@ -65,6 +65,8 @@ const handleSingIn=async()=>{
         FormLogin.email,
         FormLogin.password
         );
+        //navegar al home
+        navigation.dispatch(CommonActions.navigate({name:'Home'}))
         //console.log(response);   
     } catch (error) {
         //console.log(error)
